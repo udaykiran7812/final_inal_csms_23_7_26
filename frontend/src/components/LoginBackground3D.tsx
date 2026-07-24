@@ -3,236 +3,212 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Float, Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
 
-// 1. The Stylized 3D "S" Emblem (Ribbon/Tube Geometry)
-const SLogoEmblem: React.FC = () => {
-  const groupRef = useRef<THREE.Group>(null!);
+// 1. Pristine, Sharp 3D Metallic Helvetica/Inter Bold "S" Typography
+const CenterSilverS: React.FC = () => {
+  const sGeometry = useMemo(() => {
+    const shape = new THREE.Shape();
 
-  // Main S-curve definition
-  const { mainTubeGeo, innerTubeGeo } = useMemo(() => {
-    // Upper loop to lower loop S curve in 3D
-    const points = [
-      new THREE.Vector3(0.9, 1.25, 0.15),
-      new THREE.Vector3(0.35, 1.65, 0.25),
-      new THREE.Vector3(-0.7, 1.45, 0.1),
-      new THREE.Vector3(-1.15, 0.85, -0.1),
-      new THREE.Vector3(-0.8, 0.25, -0.15),
-      new THREE.Vector3(0.0, 0.0, 0.0),
-      new THREE.Vector3(0.8, -0.25, 0.15),
-      new THREE.Vector3(1.15, -0.85, 0.1),
-      new THREE.Vector3(0.7, -1.45, -0.1),
-      new THREE.Vector3(-0.35, -1.65, -0.25),
-      new THREE.Vector3(-0.9, -1.25, -0.15),
-    ];
+    // Exact vector mathematical contour of Helvetica/Inter Bold 'S'
+    shape.moveTo(0.68, 0.72);
+    shape.lineTo(0.22, 0.72);
+    shape.bezierCurveTo(-0.25, 0.72, -0.45, 0.58, -0.45, 0.36);
+    shape.bezierCurveTo(-0.45, 0.15, -0.22, 0.05, 0.18, -0.06);
+    shape.bezierCurveTo(0.62, -0.17, 0.85, -0.38, 0.85, -0.75);
+    shape.bezierCurveTo(0.85, -1.22, 0.45, -1.45, -0.22, -1.45);
+    shape.bezierCurveTo(-0.58, -1.45, -0.82, -1.35, -0.98, -1.22);
+    shape.lineTo(-0.82, -0.78);
+    shape.bezierCurveTo(-0.66, -0.92, -0.45, -1.02, -0.2, -1.02);
+    shape.bezierCurveTo(0.22, -1.02, 0.42, -0.88, 0.42, -0.68);
+    shape.bezierCurveTo(0.42, -0.48, 0.22, -0.38, -0.18, -0.27);
+    shape.bezierCurveTo(-0.62, -0.16, -0.85, 0.08, -0.85, 0.42);
+    shape.bezierCurveTo(-0.85, 0.88, -0.48, 1.15, 0.2, 1.15);
+    shape.bezierCurveTo(0.52, 1.15, 0.76, 1.05, 0.92, 0.92);
+    shape.closePath();
 
-    const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
-    const mainGeo = new THREE.TubeGeometry(curve, 160, 0.16, 32, false);
+    const extrudeSettings = {
+      depth: 0.3,
+      bevelEnabled: true,
+      bevelSegments: 5,
+      steps: 1,
+      bevelSize: 0.04,
+      bevelThickness: 0.05,
+    };
 
-    // Inner accent curve offset slightly inside
-    const innerPoints = points.map((p) => p.clone().multiplyScalar(0.82));
-    const innerCurve = new THREE.CatmullRomCurve3(innerPoints, false, 'centripetal');
-    const innerGeo = new THREE.TubeGeometry(innerCurve, 160, 0.09, 24, false);
-
-    return { mainTubeGeo: mainGeo, innerTubeGeo: innerGeo };
+    const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    geo.center();
+    return geo;
   }, []);
 
-  useFrame((state) => {
-    if (!groupRef.current) return;
-    const t = state.clock.getElapsedTime();
-    // Gentle floating tilt & wave rotation
-    groupRef.current.rotation.y = Math.sin(t * 0.3) * 0.15;
-    groupRef.current.rotation.x = Math.cos(t * 0.25) * 0.1;
-  });
-
   return (
-    <group ref={groupRef}>
-      {/* Outer Main Glow Tube - Vibrant Cyan to Green & Yellow finish */}
-      <mesh geometry={mainTubeGeo}>
+    <group scale={1.25}>
+      {/* Pristine 3D Silver S Typography */}
+      <mesh geometry={sGeometry}>
         <meshPhysicalMaterial
-          color="#00f2fe"
-          emissive="#00e5ff"
-          emissiveIntensity={0.6}
-          roughness={0.15}
-          metalness={0.85}
-          clearcoat={1}
-          clearcoatRoughness={0.1}
-        />
-      </mesh>
-
-      {/* Inner Accent Glow Tube - Neon Pink / Magenta */}
-      <mesh geometry={innerTubeGeo}>
-        <meshPhysicalMaterial
-          color="#ff007f"
-          emissive="#ff00a0"
-          emissiveIntensity={0.9}
-          roughness={0.1}
-          metalness={0.9}
-          clearcoat={1}
+          color="#ffffff"
+          emissive="#f1f5f9"
+          emissiveIntensity={0.35}
+          metalness={0.95}
+          roughness={0.08}
+          clearcoat={1.0}
+          clearcoatRoughness={0.04}
         />
       </mesh>
     </group>
   );
 };
 
-// 2. Orbiting Concentric Rings & Spheres (Matching Image Palette)
-const OrbitingSystem: React.FC = () => {
-  const outerRingRef = useRef<THREE.Mesh>(null!);
-  const middleRingRef = useRef<THREE.Mesh>(null!);
-  const innerRingRef = useRef<THREE.Mesh>(null!);
+// 2. Hexagonal Circuit Frame & Orbiting Tracks (Matching Reference Image)
+const HexagonalCircuitSystem: React.FC = () => {
+  const middleHexRef = useRef<THREE.Group>(null!);
+  const outerHexRef = useRef<THREE.Group>(null!);
 
-  const sphere1Ref = useRef<THREE.Mesh>(null!);
-  const sphere2Ref = useRef<THREE.Mesh>(null!);
-  const sphere3Ref = useRef<THREE.Mesh>(null!);
-  const sphere4Ref = useRef<THREE.Mesh>(null!);
+  // Vertices of a regular hexagon at radius R
+  const getHexVertices = (radius: number): [number, number, number][] => {
+    const vertices: [number, number, number][] = [];
+    for (let i = 0; i < 6; i++) {
+      const angle = (Math.PI / 3) * i - Math.PI / 6;
+      vertices.push([Math.cos(angle) * radius, Math.sin(angle) * radius, 0]);
+    }
+    return vertices;
+  };
+
+  const innerHexVertices = useMemo(() => getHexVertices(1.55), []);
+  const middleHexVertices = useMemo(() => getHexVertices(2.15), []);
+  const outerHexVertices = useMemo(() => getHexVertices(2.75), []);
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
-
-    // Rotate the 3D Rings at distinct speeds and axes
-    if (outerRingRef.current) {
-      outerRingRef.current.rotation.z = t * 0.2;
-      outerRingRef.current.rotation.x = Math.sin(t * 0.1) * 0.2;
+    if (middleHexRef.current) {
+      middleHexRef.current.rotation.z = t * 0.12;
     }
-    if (middleRingRef.current) {
-      middleRingRef.current.rotation.z = -t * 0.28;
-      middleRingRef.current.rotation.y = t * 0.15;
-    }
-    if (innerRingRef.current) {
-      innerRingRef.current.rotation.z = t * 0.35;
-      innerRingRef.current.rotation.x = Math.cos(t * 0.15) * 0.25;
-    }
-
-    // Orbiting Spheres Along Ring Paths
-    const r1 = 2.45;
-    if (sphere1Ref.current) {
-      // Neon Lime Sphere (Top-Right Orbit)
-      const angle = t * 0.6;
-      sphere1Ref.current.position.set(Math.cos(angle) * r1, Math.sin(angle) * r1, Math.sin(angle * 2) * 0.3);
-    }
-
-    const r2 = 2.85;
-    if (sphere2Ref.current) {
-      // Electric Cyan Sphere (Left Orbit)
-      const angle = -t * 0.5 + 2.0;
-      sphere2Ref.current.position.set(Math.cos(angle) * r2, Math.sin(angle) * r2 * 0.85, Math.cos(angle) * 0.5);
-    }
-
-    const r3 = 3.25;
-    if (sphere3Ref.current) {
-      // Hot Magenta Sphere (Bottom-Right Orbit)
-      const angle = t * 0.45 + 4.2;
-      sphere3Ref.current.position.set(Math.cos(angle) * r3 * 0.9, Math.sin(angle) * r3, Math.sin(angle) * 0.6);
-    }
-
-    if (sphere4Ref.current) {
-      // Bright Yellow Sphere (Top-Left Orbit)
-      const angle = -t * 0.55 + 1.1;
-      sphere4Ref.current.position.set(Math.cos(angle) * 2.1, Math.sin(angle) * 2.1, Math.cos(angle * 1.5) * 0.4);
+    if (outerHexRef.current) {
+      outerHexRef.current.rotation.z = -t * 0.16;
     }
   });
 
   return (
     <group>
-      {/* Outer Magenta Ring */}
-      <mesh ref={outerRingRef} scale={3.35}>
-        <torusGeometry args={[1, 0.018, 24, 120]} />
-        <meshStandardMaterial
-          color="#ff00b7"
-          emissive="#ff007f"
-          emissiveIntensity={0.8}
-          roughness={0.2}
-          metalness={0.8}
+      {/* Static Inner Hexagon Frame */}
+      <mesh scale={1.55}>
+        <torusGeometry args={[1, 0.035, 16, 6]} />
+        <meshPhysicalMaterial
+          color="#ffffff"
+          emissive="#cbd5e1"
+          emissiveIntensity={0.4}
+          metalness={0.9}
+          roughness={0.15}
+          clearcoat={1}
         />
       </mesh>
 
-      {/* Middle Cyan Ring */}
-      <mesh ref={middleRingRef} scale={2.85} rotation={[0.4, 0.2, 0]}>
-        <torusGeometry args={[1, 0.016, 24, 120]} />
-        <meshStandardMaterial
-          color="#00f2fe"
-          emissive="#00c8ff"
-          emissiveIntensity={0.8}
-          roughness={0.2}
-          metalness={0.8}
-        />
-      </mesh>
+      {/* Inner Hexagon Corner Nodes */}
+      {innerHexVertices.map((pos, idx) => (
+        <mesh key={`inner-node-${idx}`} position={pos}>
+          <sphereGeometry args={[0.065, 24, 24]} />
+          <meshStandardMaterial
+            color="#ffffff"
+            emissive="#e2e8f0"
+            emissiveIntensity={0.8}
+            metalness={0.9}
+          />
+        </mesh>
+      ))}
 
-      {/* Inner Lime/Yellow Ring */}
-      <mesh ref={innerRingRef} scale={2.45} rotation={[-0.3, -0.4, 0]}>
-        <torusGeometry args={[1, 0.015, 24, 120]} />
-        <meshStandardMaterial
-          color="#a8ff00"
-          emissive="#76ff00"
-          emissiveIntensity={0.7}
-          roughness={0.2}
-          metalness={0.8}
-        />
-      </mesh>
+      {/* Middle Rotating Hexagonal Circuit Track */}
+      <group ref={middleHexRef}>
+        <mesh scale={2.15} rotation={[0, 0, 0]}>
+          <torusGeometry args={[1, 0.03, 16, 6, Math.PI * 1.35]} />
+          <meshPhysicalMaterial
+            color="#e2e8f0"
+            emissive="#cbd5e1"
+            emissiveIntensity={0.5}
+            metalness={0.95}
+            roughness={0.1}
+          />
+        </mesh>
+        <mesh scale={2.15} rotation={[0, 0, Math.PI]}>
+          <torusGeometry args={[1, 0.03, 16, 6, Math.PI * 1.35]} />
+          <meshPhysicalMaterial
+            color="#e2e8f0"
+            emissive="#cbd5e1"
+            emissiveIntensity={0.5}
+            metalness={0.95}
+            roughness={0.1}
+          />
+        </mesh>
 
-      {/* Orbiting Sphere 1 - Neon Lime Green */}
-      <mesh ref={sphere1Ref}>
-        <sphereGeometry args={[0.13, 32, 32]} />
-        <meshStandardMaterial
-          color="#76ff00"
-          emissive="#a8ff00"
-          emissiveIntensity={1.5}
-          roughness={0.1}
-        />
-      </mesh>
+        {/* Middle Hexagon Circuit Nodes */}
+        {middleHexVertices.slice(0, 4).map((pos, idx) => (
+          <mesh key={`mid-node-${idx}`} position={pos}>
+            <sphereGeometry args={[0.075, 24, 24]} />
+            <meshStandardMaterial
+              color="#ffffff"
+              emissive="#f8fafc"
+              emissiveIntensity={1.2}
+              metalness={0.95}
+            />
+          </mesh>
+        ))}
+      </group>
 
-      {/* Orbiting Sphere 2 - Electric Cyan */}
-      <mesh ref={sphere2Ref}>
-        <sphereGeometry args={[0.16, 32, 32]} />
-        <meshStandardMaterial
-          color="#00e5ff"
-          emissive="#00f2fe"
-          emissiveIntensity={1.5}
-          roughness={0.1}
-        />
-      </mesh>
+      {/* Outer Counter-Rotating Hexagonal Circuit Track */}
+      <group ref={outerHexRef}>
+        <mesh scale={2.75} rotation={[0, 0, Math.PI / 6]}>
+          <torusGeometry args={[1, 0.028, 16, 6, Math.PI * 1.5]} />
+          <meshPhysicalMaterial
+            color="#cbd5e1"
+            emissive="#94a3b8"
+            emissiveIntensity={0.4}
+            metalness={0.95}
+            roughness={0.1}
+          />
+        </mesh>
+        <mesh scale={2.75} rotation={[0, 0, (7 * Math.PI) / 6]}>
+          <torusGeometry args={[1, 0.028, 16, 6, Math.PI * 1.2]} />
+          <meshPhysicalMaterial
+            color="#cbd5e1"
+            emissive="#94a3b8"
+            emissiveIntensity={0.4}
+            metalness={0.95}
+            roughness={0.1}
+          />
+        </mesh>
 
-      {/* Orbiting Sphere 3 - Vivid Magenta */}
-      <mesh ref={sphere3Ref}>
-        <sphereGeometry args={[0.15, 32, 32]} />
-        <meshStandardMaterial
-          color="#ff00a0"
-          emissive="#ff00d4"
-          emissiveIntensity={1.5}
-          roughness={0.1}
-        />
-      </mesh>
-
-      {/* Orbiting Sphere 4 - Bright Yellow */}
-      <mesh ref={sphere4Ref}>
-        <sphereGeometry args={[0.12, 32, 32]} />
-        <meshStandardMaterial
-          color="#ffd700"
-          emissive="#ffea00"
-          emissiveIntensity={1.5}
-          roughness={0.1}
-        />
-      </mesh>
+        {/* Outer Hexagon Circuit Terminal Nodes */}
+        {outerHexVertices.map((pos, idx) => (
+          <mesh key={`outer-node-${idx}`} position={pos}>
+            <sphereGeometry args={[0.08, 24, 24]} />
+            <meshStandardMaterial
+              color="#ffffff"
+              emissive="#ffffff"
+              emissiveIntensity={1.5}
+              metalness={0.95}
+            />
+          </mesh>
+        ))}
+      </group>
     </group>
   );
 };
 
-// 3. Interactive Scene Rig with Mouse Parallax Rotation & Right-Side Positioning
+// 3. Interactive 3D Scene Rig (Right Side Position & Mouse Parallax)
 const InteractiveSceneRig: React.FC = () => {
   const sceneGroupRef = useRef<THREE.Group>(null!);
   const { viewport } = useThree();
 
-  // Position 3D emblem to the right side on desktop, centered on mobile screens
+  // Position 3D Hexagonal Emblem on the right side on desktop, centered on mobile
   const isMobile = viewport.width < 7.5;
   const targetX = isMobile ? 0 : Math.min(viewport.width * 0.24, 2.5);
-  const targetScale = isMobile ? 0.85 : 1.0;
+  const targetScale = isMobile ? 0.85 : 1.05;
 
   useFrame((state) => {
     if (!sceneGroupRef.current) return;
     const { x, y } = state.pointer;
     const t = state.clock.getElapsedTime();
 
-    // Continuous 3D rotation + smooth mouse pointer parallax tilt
-    const targetRotY = t * 0.25 + x * 0.45;
-    const targetRotX = Math.sin(t * 0.2) * 0.15 - y * 0.45;
+    // Gentle 3D floating rotation & interactive mouse tilt
+    const targetRotY = Math.sin(t * 0.25) * 0.12 + x * 0.4;
+    const targetRotX = Math.cos(t * 0.2) * 0.1 - y * 0.4;
 
     sceneGroupRef.current.rotation.y = THREE.MathUtils.lerp(sceneGroupRef.current.rotation.y, targetRotY, 0.05);
     sceneGroupRef.current.rotation.x = THREE.MathUtils.lerp(sceneGroupRef.current.rotation.x, targetRotX, 0.05);
@@ -240,9 +216,9 @@ const InteractiveSceneRig: React.FC = () => {
 
   return (
     <group ref={sceneGroupRef} position={[targetX, 0, 0]} scale={targetScale}>
-      <Float speed={2.5} rotationIntensity={0.2} floatIntensity={0.5}>
-        <SLogoEmblem />
-        <OrbitingSystem />
+      <Float speed={2.0} rotationIntensity={0.15} floatIntensity={0.35}>
+        <CenterSilverS />
+        <HexagonalCircuitSystem />
       </Float>
     </group>
   );
@@ -251,28 +227,27 @@ const InteractiveSceneRig: React.FC = () => {
 // 4. Main Exported 3D Canvas Background Component
 export const LoginBackground3D: React.FC = () => {
   return (
-    <div className="absolute inset-0 z-0 overflow-hidden bg-[#090314] pointer-events-auto">
+    <div className="absolute inset-0 z-0 overflow-hidden bg-[#030305] pointer-events-auto">
       <Canvas camera={{ position: [0, 0, 7], fov: 50 }}>
-        {/* Ambient & Multi-Color Point Lighting */}
-        <ambientLight intensity={0.6} />
-        <directionalLight position={[10, 10, 10]} intensity={1.2} color="#ffffff" />
+        {/* Ambient & Metallic Directional Lights */}
+        <ambientLight intensity={0.7} />
+        <directionalLight position={[10, 10, 10]} intensity={1.8} color="#ffffff" />
+        <directionalLight position={[-10, -10, -5]} intensity={0.8} color="#94a3b8" />
         
-        {/* Neon Accent Lights matching Image Palette */}
-        <pointLight position={[-6, 6, 4]} color="#ff00a0" intensity={4} distance={15} />
-        <pointLight position={[6, -6, 4]} color="#00f2fe" intensity={4} distance={15} />
-        <pointLight position={[0, 6, -4]} color="#a8ff00" intensity={3} distance={15} />
-        <pointLight position={[0, -6, -4]} color="#ffea00" intensity={3} distance={15} />
+        {/* Subtle Platinum/Silver Point Lights */}
+        <pointLight position={[5, 5, 5]} color="#ffffff" intensity={3} distance={15} />
+        <pointLight position={[-5, -5, 5]} color="#e2e8f0" intensity={2} distance={15} />
 
-        {/* Ambient 3D Glowing Dust Particles */}
-        <Sparkles count={80} scale={10} size={2.5} speed={0.4} opacity={0.6} color="#00e5ff" />
-        <Sparkles count={60} scale={10} size={2.5} speed={0.4} opacity={0.6} color="#ff00d4" />
+        {/* Ambient Floating Silver Sparkles */}
+        <Sparkles count={50} scale={10} size={2.0} speed={0.3} opacity={0.5} color="#ffffff" />
+        <Sparkles count={40} scale={10} size={1.8} speed={0.3} opacity={0.4} color="#cbd5e1" />
 
-        {/* Interactive 3D Model Positioned Right */}
+        {/* Interactive 3D Model */}
         <InteractiveSceneRig />
       </Canvas>
 
-      {/* Radial Gradient Glow Vignette */}
-      <div className="absolute inset-0 bg-radial-gradient from-transparent via-[#090314]/40 to-[#090314] pointer-events-none" />
+      {/* Radial Gradient Vignette Overlay */}
+      <div className="absolute inset-0 bg-radial-gradient from-transparent via-[#030305]/50 to-[#030305] pointer-events-none" />
     </div>
   );
 };
