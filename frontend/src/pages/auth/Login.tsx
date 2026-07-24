@@ -4,12 +4,14 @@ import { useAuth } from '../../context/AuthContext';
 import { authService } from '../../services/authService';
 import { AlertCircle, Lock, Mail, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { PandaAvatar } from '../../components/PandaAvatar';
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [focusState, setFocusState] = useState<'email' | 'password' | 'normal'>('normal');
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -52,6 +54,9 @@ export const Login: React.FC = () => {
       className="space-y-5" 
       onSubmit={handleSubmit}
     >
+      {/* Interactive Panda Avatar Header */}
+      <PandaAvatar focusState={focusState} />
+
       {error && (
         <motion.div 
           initial={{ opacity: 0, y: -10 }}
@@ -79,6 +84,8 @@ export const Login: React.FC = () => {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onFocus={() => setFocusState('email')}
+            onBlur={() => setFocusState('normal')}
             className="w-full pl-10 pr-4 py-2.5 bg-slate-950/70 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-200"
             placeholder="enter your campus email"
           />
@@ -101,6 +108,8 @@ export const Login: React.FC = () => {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onFocus={() => setFocusState('password')}
+            onBlur={() => setFocusState('normal')}
             className="w-full pl-10 pr-4 py-2.5 bg-slate-950/70 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-200"
             placeholder="••••••••"
           />
