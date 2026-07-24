@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { authService } from '../../services/authService';
-import { ShieldAlert, AlertCircle } from 'lucide-react';
+import { AlertCircle, Lock, Mail, ArrowRight, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -44,19 +45,32 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit}>
+    <motion.form 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="space-y-5" 
+      onSubmit={handleSubmit}
+    >
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start space-x-3 text-red-800 text-sm">
-          <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-500 mt-0.5" />
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-950/60 border border-red-500/30 rounded-xl p-4 flex items-start space-x-3 text-red-200 text-sm shadow-inner"
+        >
+          <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-400 mt-0.5" />
           <span>{error}</span>
-        </div>
+        </motion.div>
       )}
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-slate-700">
+        <label htmlFor="email" className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
           Email Address
         </label>
-        <div className="mt-1">
+        <div className="relative rounded-xl shadow-sm">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+            <Mail className="w-4 h-4" />
+          </div>
           <input
             id="email"
             name="email"
@@ -65,17 +79,20 @@ export const Login: React.FC = () => {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+            className="w-full pl-10 pr-4 py-2.5 bg-slate-950/70 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-200"
             placeholder="enter your campus email"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+        <label htmlFor="password" className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
           Password
         </label>
-        <div className="mt-1">
+        <div className="relative rounded-xl shadow-sm">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+            <Lock className="w-4 h-4" />
+          </div>
           <input
             id="password"
             name="password"
@@ -84,22 +101,34 @@ export const Login: React.FC = () => {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+            className="w-full pl-10 pr-4 py-2.5 bg-slate-950/70 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-200"
             placeholder="••••••••"
           />
         </div>
       </div>
 
-      <div>
-        <button
+      <div className="pt-2">
+        <motion.button
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.97 }}
           type="submit"
           disabled={loading}
-          className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          className="w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-xl font-semibold text-sm text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-indigo-600/30"
         >
-          {loading ? 'Signing in...' : 'Sign In'}
-        </button>
+          {loading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin text-white" />
+              <span>Signing in...</span>
+            </>
+          ) : (
+            <>
+              <span>Sign In</span>
+              <ArrowRight className="w-4 h-4 ml-1" />
+            </>
+          )}
+        </motion.button>
       </div>
-    </form>
+    </motion.form>
   );
 };
 export default Login;

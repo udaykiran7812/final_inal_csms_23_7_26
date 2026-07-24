@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { reportService } from '../../services/reportService';
 import { HealthScoreModal, ScoreEvent } from '../../components/HealthScoreModal';
+import { motion } from 'framer-motion';
 import {
   Users,
   UserCheck,
@@ -17,7 +18,6 @@ import {
   Trash2,
   Award,
   ShieldCheck,
-  TrendingUp,
 } from 'lucide-react';
 import {
   BarChart,
@@ -32,6 +32,25 @@ import {
   Cell,
   Legend,
 } from 'recharts';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 15 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { type: 'spring' as const, stiffness: 300, damping: 24 } 
+  },
+};
 
 export const SuperAdminDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -62,14 +81,14 @@ export const SuperAdminDashboard: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500"></div>
       </div>
     );
   }
 
   if (error || !stats) {
     return (
-      <div className="p-6 bg-red-50 text-red-700 rounded-xl">
+      <div className="p-6 bg-red-50 dark:bg-red-950/80 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-200 rounded-2xl shadow-xl">
         Failed to load Super Admin dashboard analytics.
       </div>
     );
@@ -95,9 +114,9 @@ export const SuperAdminDashboard: React.FC = () => {
   );
 
   const getScoreBadgeClass = (score: number) => {
-    if (score >= 90) return 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100';
-    if (score >= 75) return 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100';
-    return 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100';
+    if (score >= 90) return 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/80';
+    if (score >= 75) return 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-500/40 hover:bg-amber-100 dark:hover:bg-amber-900/80';
+    return 'bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-300 border-red-200 dark:border-red-500/40 hover:bg-red-100 dark:hover:bg-red-900/80';
   };
 
   return (
@@ -112,16 +131,22 @@ export const SuperAdminDashboard: React.FC = () => {
       />
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+      >
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Enterprise IT Service Management HQ</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Enterprise IT Service Management HQ</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Real-time SLA tracking, department health scores, and staff performance analytics
           </p>
         </div>
         <div className="flex items-center space-x-3">
           {stats.totalTickets > 0 && (
-            <button
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.96 }}
               onClick={async () => {
                 if (!window.confirm(`🚨 DANGER: Are you sure you want to PERMANENTLY clear ALL ${stats.totalTickets} tickets?\n\nThis will remove all active tickets across all portals.`)) return;
                 try {
@@ -133,197 +158,246 @@ export const SuperAdminDashboard: React.FC = () => {
                   alert(err.response?.data?.message || 'Failed to clear all tickets.');
                 }
               }}
-              className="flex items-center space-x-1.5 px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 font-semibold text-xs rounded-lg border border-red-200 shadow-xs transition-all cursor-pointer"
+              className="flex items-center space-x-1.5 px-3.5 py-2 bg-red-50 dark:bg-red-950/50 hover:bg-red-100 dark:hover:bg-red-900/80 text-red-700 dark:text-red-300 font-semibold text-xs rounded-xl border border-red-200 dark:border-red-500/30 shadow-md transition-all cursor-pointer"
             >
               <Trash2 className="w-4 h-4" />
               <span>Clear All Tickets ({stats.totalTickets})</span>
-            </button>
+            </motion.button>
           )}
-          <div className="flex items-center space-x-2 bg-indigo-50 border border-indigo-100 text-indigo-700 px-4 py-2 rounded-lg text-sm font-semibold">
-            <Clock className="w-4 h-4" />
-            <span>Avg Resolution Time: {stats.averageResolutionTimeHours} hrs</span>
+          <div className="flex items-center space-x-2 bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-500/30 text-indigo-700 dark:text-indigo-300 px-4 py-2 rounded-xl text-sm font-semibold shadow-sm">
+            <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <span>Avg Resolution: {stats.averageResolutionTimeHours} hrs</span>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Metric Cards Row 1 (INTERACTIVE - Click to Navigate) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        <div
+      {/* Metric Cards Row 1 */}
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4"
+      >
+        <motion.div
+          variants={itemVariants}
+          whileHover={{ y: -4, scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => navigate('/admin/users')}
-          className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center space-x-4 cursor-pointer hover:border-blue-300 hover:shadow-md transition-all group"
+          className="bg-white dark:bg-slate-900/90 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl flex items-center space-x-4 cursor-pointer hover:border-blue-400 dark:hover:border-blue-500/50 transition-all group backdrop-blur-xl"
         >
-          <div className="p-3 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-colors">
+          <div className="p-3 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">
             <Users className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Users</p>
-            <p className="text-2xl font-bold text-slate-900 mt-0.5">{stats.totalUsers}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Total Users</p>
+            <p className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{stats.totalUsers}</p>
           </div>
-        </div>
+        </motion.div>
 
-        <div
+        <motion.div
+          variants={itemVariants}
+          whileHover={{ y: -4, scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => navigate('/admin/staff')}
-          className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center space-x-4 cursor-pointer hover:border-emerald-300 hover:shadow-md transition-all group"
+          className="bg-white dark:bg-slate-900/90 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl flex items-center space-x-4 cursor-pointer hover:border-emerald-400 dark:hover:border-emerald-500/50 transition-all group backdrop-blur-xl"
         >
-          <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+          <div className="p-3 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">
             <UserCheck className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Staff</p>
-            <p className="text-2xl font-bold text-slate-900 mt-0.5">{stats.totalStaff}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Total Staff</p>
+            <p className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{stats.totalStaff}</p>
           </div>
-        </div>
+        </motion.div>
 
-        <div
+        <motion.div
+          variants={itemVariants}
+          whileHover={{ y: -4, scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => navigate('/admin/departments')}
-          className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center space-x-4 cursor-pointer hover:border-indigo-300 hover:shadow-md transition-all group"
+          className="bg-white dark:bg-slate-900/90 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl flex items-center space-x-4 cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500/50 transition-all group backdrop-blur-xl"
         >
-          <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+          <div className="p-3 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
             <Building2 className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Departments</p>
-            <p className="text-2xl font-bold text-slate-900 mt-0.5">{stats.totalDepartments}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Departments</p>
+            <p className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{stats.totalDepartments}</p>
           </div>
-        </div>
+        </motion.div>
 
-        <div
+        <motion.div
+          variants={itemVariants}
+          whileHover={{ y: -4, scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => navigate('/admin/departments')}
-          className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center space-x-4 cursor-pointer hover:border-purple-300 hover:shadow-md transition-all group"
+          className="bg-white dark:bg-slate-900/90 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl flex items-center space-x-4 cursor-pointer hover:border-purple-400 dark:hover:border-purple-500/50 transition-all group backdrop-blur-xl"
         >
-          <div className="p-3 bg-purple-50 text-purple-600 rounded-lg group-hover:bg-purple-600 group-hover:text-white transition-colors">
+          <div className="p-3 bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20 rounded-xl group-hover:bg-purple-600 group-hover:text-white transition-colors">
             <GitMerge className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Sub-Depts</p>
-            <p className="text-2xl font-bold text-slate-900 mt-0.5">{stats.totalSubDepartments}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Sub-Depts</p>
+            <p className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{stats.totalSubDepartments}</p>
           </div>
-        </div>
+        </motion.div>
 
-        <div
+        <motion.div
+          variants={itemVariants}
+          whileHover={{ y: -4, scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => navigate('/admin/tickets')}
-          className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center space-x-4 cursor-pointer hover:border-amber-300 hover:shadow-md transition-all group"
+          className="bg-white dark:bg-slate-900/90 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl flex items-center space-x-4 cursor-pointer hover:border-amber-400 dark:hover:border-amber-500/50 transition-all group backdrop-blur-xl"
         >
-          <div className="p-3 bg-amber-50 text-amber-600 rounded-lg group-hover:bg-amber-600 group-hover:text-white transition-colors">
+          <div className="p-3 bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20 rounded-xl group-hover:bg-amber-600 group-hover:text-white transition-colors">
             <Ticket className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Tickets</p>
-            <p className="text-2xl font-bold text-slate-900 mt-0.5">{stats.totalTickets}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Total Tickets</p>
+            <p className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{stats.totalTickets}</p>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
-      {/* Ticket Status Cards Row 2 (INTERACTIVE - Click to Navigate) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div
+      {/* Ticket Status Cards Row 2 */}
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+      >
+        <motion.div
+          variants={itemVariants}
+          whileHover={{ y: -4, scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => navigate('/admin/tickets?status=OPEN')}
-          className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between cursor-pointer hover:border-indigo-400 hover:shadow-md transition-all group"
+          className="bg-white dark:bg-slate-900/90 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl flex items-center justify-between cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500/50 transition-all group backdrop-blur-xl"
         >
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Open Tickets</p>
-            <p className="text-2xl font-bold text-indigo-600 mt-1">{stats.openTickets}</p>
-            <p className="text-[11px] text-indigo-500 font-medium mt-1">Click to view open tickets →</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Open Tickets</p>
+            <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1">{stats.openTickets}</p>
+            <p className="text-[11px] text-indigo-500 dark:text-indigo-300 font-medium mt-1">View open tickets →</p>
           </div>
-          <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-sm group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+          <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center font-extrabold text-sm group-hover:bg-indigo-600 group-hover:text-white transition-colors">
             {stats.totalTickets > 0 ? Math.round((stats.openTickets / stats.totalTickets) * 100) : 0}%
           </div>
-        </div>
+        </motion.div>
 
-        <div
+        <motion.div
+          variants={itemVariants}
+          whileHover={{ y: -4, scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => navigate('/admin/tickets?status=PENDING')}
-          className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between cursor-pointer hover:border-amber-400 hover:shadow-md transition-all group"
+          className="bg-white dark:bg-slate-900/90 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl flex items-center justify-between cursor-pointer hover:border-amber-400 dark:hover:border-amber-500/50 transition-all group backdrop-blur-xl"
         >
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Pending Tickets</p>
-            <p className="text-2xl font-bold text-amber-600 mt-1">{stats.pendingTickets}</p>
-            <p className="text-[11px] text-amber-500 font-medium mt-1">Click to view pending list →</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Pending Tickets</p>
+            <p className="text-2xl font-black text-amber-600 dark:text-amber-400 mt-1">{stats.pendingTickets}</p>
+            <p className="text-[11px] text-amber-500 dark:text-amber-300 font-medium mt-1">View pending list →</p>
           </div>
-          <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 font-bold text-sm group-hover:bg-amber-600 group-hover:text-white transition-colors">
+          <div className="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30 flex items-center justify-center font-extrabold text-sm group-hover:bg-amber-600 group-hover:text-white transition-colors">
             {stats.totalTickets > 0 ? Math.round((stats.pendingTickets / stats.totalTickets) * 100) : 0}%
           </div>
-        </div>
+        </motion.div>
 
-        <div
+        <motion.div
+          variants={itemVariants}
+          whileHover={{ y: -4, scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => navigate('/admin/tickets?status=RESOLVED')}
-          className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between cursor-pointer hover:border-emerald-400 hover:shadow-md transition-all group"
+          className="bg-white dark:bg-slate-900/90 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl flex items-center justify-between cursor-pointer hover:border-emerald-400 dark:hover:border-emerald-500/50 transition-all group backdrop-blur-xl"
         >
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Resolved Tickets</p>
-            <p className="text-2xl font-bold text-emerald-600 mt-1">{stats.completedTickets}</p>
-            <p className="text-[11px] text-emerald-500 font-medium mt-1">Click to view resolved list →</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Resolved Tickets</p>
+            <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{stats.completedTickets}</p>
+            <p className="text-[11px] text-emerald-500 dark:text-emerald-300 font-medium mt-1">View resolved list →</p>
           </div>
-          <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+          <div className="p-2.5 bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 rounded-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">
             <CheckCircle2 className="w-6 h-6" />
           </div>
-        </div>
+        </motion.div>
 
-        <div
+        <motion.div
+          variants={itemVariants}
+          whileHover={{ y: -4, scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => navigate('/admin/tickets?slaBreached=true')}
-          className="bg-white p-5 rounded-xl border border-slate-200 border-l-4 border-l-red-500 shadow-xs flex items-center justify-between cursor-pointer hover:border-red-400 hover:shadow-md transition-all group"
+          className={`bg-white dark:bg-slate-900/90 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 border-l-4 border-l-red-500 shadow-xl flex items-center justify-between cursor-pointer hover:border-red-400 dark:hover:border-red-500/50 transition-all group backdrop-blur-xl ${
+            stats.slaBreaches > 0 ? 'glow-red-pulse' : ''
+          }`}
         >
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">SLA Breaches</p>
-            <p className="text-2xl font-bold text-red-600 mt-1">{stats.slaBreaches}</p>
-            <p className="text-[11px] text-red-500 font-medium mt-1">Click to view breached list →</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">SLA Breaches</p>
+            <p className="text-2xl font-black text-red-600 dark:text-red-400 mt-1">{stats.slaBreaches}</p>
+            <p className="text-[11px] text-red-500 dark:text-red-300 font-medium mt-1">View breached list →</p>
           </div>
-          <div className="p-2 bg-red-50 text-red-600 rounded-lg group-hover:bg-red-600 group-hover:text-white transition-colors">
+          <div className="p-2.5 bg-red-50 dark:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/30 rounded-xl group-hover:bg-red-600 group-hover:text-white transition-colors">
             <AlertTriangle className="w-6 h-6" />
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* System Infrastructure Card */}
-      <div className="bg-slate-900 text-white p-6 rounded-xl shadow-md border border-slate-800 space-y-4">
+      <motion.div 
+        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 20 }}
+        viewport={{ once: true }}
+        className="bg-slate-900 text-white dark:bg-slate-900/95 p-6 rounded-2xl shadow-2xl border border-slate-800 space-y-4 backdrop-blur-xl"
+      >
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
-            <h3 className="font-bold text-base tracking-wide">Enterprise Infrastructure & System Performance</h3>
+          <div className="flex items-center space-x-2.5">
+            <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse glow-indigo" />
+            <h3 className="font-extrabold text-base tracking-wide text-white">Enterprise Infrastructure & System Performance</h3>
           </div>
-          <span className="text-xs text-slate-400 font-mono">Status: HEALTHY</span>
+          <span className="text-xs text-emerald-400 font-mono bg-emerald-950/60 px-2.5 py-1 rounded-md border border-emerald-500/30">STATUS: HEALTHY</span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-1">
-          <div className="p-3 bg-slate-800/60 rounded-lg border border-slate-800">
-            <p className="text-[11px] text-slate-400 font-medium uppercase">API Throughput</p>
-            <p className="text-xl font-bold text-emerald-400 mt-1">99.94%</p>
+          <div className="p-3.5 bg-slate-950/60 rounded-xl border border-slate-800/80">
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">API Throughput</p>
+            <p className="text-xl font-extrabold text-emerald-400 mt-1">99.94%</p>
             <p className="text-[10px] text-slate-500 mt-0.5">Response Time &lt; 45ms</p>
           </div>
           <div
             onClick={() => navigate('/admin/tickets?slaBreached=true')}
-            className="p-3 bg-slate-800/60 rounded-lg border border-slate-800 cursor-pointer hover:border-indigo-500 transition-colors"
+            className="p-3.5 bg-slate-950/60 rounded-xl border border-slate-800/80 cursor-pointer hover:border-indigo-500/50 transition-colors"
           >
-            <p className="text-[11px] text-slate-400 font-medium uppercase">Active SLA Compliance</p>
-            <p className="text-xl font-bold text-indigo-400 mt-1">
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Active SLA Compliance</p>
+            <p className="text-xl font-extrabold text-indigo-400 mt-1">
               {stats.totalTickets > 0 ? Math.round(((stats.totalTickets - stats.slaBreaches) / stats.totalTickets) * 100) : 100}%
             </p>
             <p className="text-[10px] text-indigo-300 mt-0.5 font-medium">{stats.slaBreaches} total breaches (Click to view)</p>
           </div>
-          <div className="p-3 bg-slate-800/60 rounded-lg border border-slate-800">
-            <p className="text-[11px] text-slate-400 font-medium uppercase">Database Connection Pool</p>
-            <p className="text-xl font-bold text-purple-400 mt-1">10 / 10 Active</p>
+          <div className="p-3.5 bg-slate-950/60 rounded-xl border border-slate-800/80">
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Database Connection Pool</p>
+            <p className="text-xl font-extrabold text-purple-400 mt-1">10 / 10 Active</p>
             <p className="text-[10px] text-slate-500 mt-0.5">MySQL HikariCP pool</p>
           </div>
-          <div className="p-3 bg-slate-800/60 rounded-lg border border-slate-800">
-            <p className="text-[11px] text-slate-400 font-medium uppercase">System Engine Status</p>
-            <p className="text-xl font-bold text-blue-400 mt-1">SLA Scheduler Active</p>
+          <div className="p-3.5 bg-slate-950/60 rounded-xl border border-slate-800/80">
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">System Engine Status</p>
+            <p className="text-xl font-extrabold text-blue-400 mt-1">SLA Scheduler Active</p>
             <p className="text-[10px] text-slate-500 mt-0.5">Runs every 60s</p>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <motion.div 
+        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 25 }}
+        viewport={{ once: true }}
+        className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+      >
         {/* Department Performance Bar Chart */}
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-xs">
-          <h2 className="text-lg font-bold text-slate-900 mb-4">Department Performance Breakdown</h2>
+        <div className="bg-white dark:bg-slate-900/90 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl backdrop-blur-xl">
+          <h2 className="text-lg font-extrabold text-slate-900 dark:text-white mb-4 tracking-tight">Department Performance Breakdown</h2>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats.departmentPerformance || []}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#94a3b8" opacity={0.3} />
                 <XAxis dataKey="departmentName" stroke="#64748b" fontSize={12} />
                 <YAxis stroke="#64748b" fontSize={12} />
-                <Tooltip />
+                <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#f8fafc' }} />
                 <Legend />
                 <Bar dataKey="totalTickets" fill="#6366f1" name="Total Tickets" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="resolvedTickets" fill="#10b981" name="Resolved" radius={[4, 4, 0, 0]} />
@@ -334,8 +408,8 @@ export const SuperAdminDashboard: React.FC = () => {
         </div>
 
         {/* Ticket Status Pie Chart */}
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-xs">
-          <h2 className="text-lg font-bold text-slate-900 mb-4">Ticket Status Distribution</h2>
+        <div className="bg-white dark:bg-slate-900/90 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl backdrop-blur-xl">
+          <h2 className="text-lg font-extrabold text-slate-900 dark:text-white mb-4 tracking-tight">Ticket Status Distribution</h2>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -352,62 +426,67 @@ export const SuperAdminDashboard: React.FC = () => {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#f8fafc' }} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Department Health Score & Compliance Overview */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+      {/* Department Health Score Overview */}
+      <motion.div 
+        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 25 }}
+        viewport={{ once: true }}
+        className="bg-white dark:bg-slate-900/90 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden backdrop-blur-xl"
+      >
+        <div className="px-6 py-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/70 dark:bg-slate-950/60">
           <div>
-            <h3 className="font-bold text-slate-900 text-lg">Department Health Scores & Transparent Audit</h3>
-            <p className="text-xs text-slate-500">Every department starts at 100%. Click any score to view transparent point calculations.</p>
+            <h3 className="font-extrabold text-slate-900 dark:text-white text-lg tracking-tight">Department Health Scores & Transparent Audit</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Every department starts at 100%. Click any score to view transparent point calculations.</p>
           </div>
-          <div className="flex items-center space-x-1.5 text-xs text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 font-semibold">
-            <Award className="w-4 h-4" />
+          <div className="flex items-center space-x-1.5 text-xs text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-3.5 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-500/30 font-semibold shadow-sm">
+            <Award className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
             <span>Explainable Scoring Engine</span>
           </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-sm">
             <thead>
-              <tr className="bg-slate-50 text-slate-500 uppercase text-[11px] font-semibold tracking-wider">
-                <th className="px-6 py-3">Department Name</th>
-                <th className="px-6 py-3">Department Health Score</th>
-                <th className="px-6 py-3">Total Tickets</th>
-                <th className="px-6 py-3">Open / Active</th>
-                <th className="px-6 py-3">Resolved</th>
-                <th className="px-6 py-3">SLA Breaches</th>
-                <th className="px-6 py-3">SLA Compliance</th>
+              <tr className="bg-slate-50 dark:bg-slate-950/80 text-slate-500 dark:text-slate-400 uppercase text-[11px] font-semibold tracking-wider border-b border-slate-200 dark:border-slate-800">
+                <th className="px-6 py-3.5">Department Name</th>
+                <th className="px-6 py-3.5">Department Health Score</th>
+                <th className="px-6 py-3.5">Total Tickets</th>
+                <th className="px-6 py-3.5">Open / Active</th>
+                <th className="px-6 py-3.5">Resolved</th>
+                <th className="px-6 py-3.5">SLA Breaches</th>
+                <th className="px-6 py-3.5">SLA Compliance</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50 text-slate-700 dark:text-slate-300">
               {(stats.departmentPerformance || []).map((dept) => {
                 const score = dept.healthScore !== undefined ? dept.healthScore : 100;
                 return (
-                  <tr key={dept.departmentName} className="hover:bg-slate-50/50">
-                    <td className="px-6 py-4 font-semibold text-slate-900">{dept.departmentName}</td>
+                  <tr key={dept.departmentName} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                    <td className="px-6 py-4 font-bold text-slate-900 dark:text-white">{dept.departmentName}</td>
                     <td className="px-6 py-4">
                       <button
                         onClick={() => openAuditModal(`${dept.departmentName} Department`, score, dept.scoreBreakdown)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-black border transition-all cursor-pointer flex items-center space-x-1.5 ${getScoreBadgeClass(score)}`}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-black border transition-all cursor-pointer flex items-center space-x-1.5 ${getScoreBadgeClass(score)}`}
                         title="Click to view transparent point calculation breakdown"
                       >
                         <Award className="w-3.5 h-3.5" />
                         <span>{score}% Score</span>
                       </button>
                     </td>
-                    <td className="px-6 py-4 text-slate-600">{dept.totalTickets}</td>
-                    <td className="px-6 py-4 text-indigo-600 font-medium">{dept.openTickets}</td>
-                    <td className="px-6 py-4 text-emerald-600 font-medium">{dept.resolvedTickets}</td>
-                    <td className="px-6 py-4 text-red-600 font-medium">{dept.slaBreachedTickets}</td>
+                    <td className="px-6 py-4 text-slate-600 dark:text-slate-400">{dept.totalTickets}</td>
+                    <td className="px-6 py-4 text-indigo-600 dark:text-indigo-400 font-semibold">{dept.openTickets}</td>
+                    <td className="px-6 py-4 text-emerald-600 dark:text-emerald-400 font-semibold">{dept.resolvedTickets}</td>
+                    <td className="px-6 py-4 text-red-600 dark:text-red-400 font-semibold">{dept.slaBreachedTickets}</td>
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-2">
-                        <div className="w-24 bg-slate-100 rounded-full h-2 overflow-hidden">
+                        <div className="w-24 bg-slate-200 dark:bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-300 dark:border-slate-800">
                           <div
                             className={`h-full ${
                               dept.slaCompliancePercentage >= 90
@@ -419,7 +498,7 @@ export const SuperAdminDashboard: React.FC = () => {
                             style={{ width: `${dept.slaCompliancePercentage}%` }}
                           />
                         </div>
-                        <span className="font-bold text-xs text-slate-700">{dept.slaCompliancePercentage}%</span>
+                        <span className="font-bold text-xs text-slate-700 dark:text-slate-300">{dept.slaCompliancePercentage}%</span>
                       </div>
                     </td>
                   </tr>
@@ -428,128 +507,7 @@ export const SuperAdminDashboard: React.FC = () => {
             </tbody>
           </table>
         </div>
-      </div>
-
-      {/* Staff Performance & Workload Section with Explainable Scores */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="p-6 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h3 className="font-bold text-slate-900 text-lg">Staff Performance Scores & Achievement Directory</h3>
-            <p className="text-xs text-slate-500">Track personal scores (0-100%), rankings, and achievement badges per engineer</p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-center gap-3">
-            <div className="relative w-full sm:w-64">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-              <input
-                type="text"
-                placeholder="Search staff name..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-
-            <div className="flex items-center space-x-2 w-full sm:w-auto">
-              <Filter className="w-4 h-4 text-slate-400" />
-              <select
-                value={deptFilter}
-                onChange={(e) => setDeptFilter(e.target.value)}
-                className="border border-slate-300 rounded-lg text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
-              >
-                <option value="ALL">All Departments</option>
-                {uniqueDepartments.map((d) => (
-                  <option key={String(d)} value={String(d)}>
-                    {String(d)}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-sm">
-            <thead>
-              <tr className="bg-slate-50 text-slate-500 uppercase text-[11px] font-semibold tracking-wider">
-                <th className="px-6 py-3">Rank</th>
-                <th className="px-6 py-3">Staff Engineer</th>
-                <th className="px-6 py-3">Performance Score</th>
-                <th className="px-6 py-3">Badges & Honors</th>
-                <th className="px-6 py-3">Department</th>
-                <th className="px-6 py-3">Assigned / Resolved</th>
-                <th className="px-6 py-3">SLA Breaches</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200">
-              {filteredStaffPerformance.length > 0 ? (
-                filteredStaffPerformance.map((staff) => {
-                  const score = staff.healthScore !== undefined ? staff.healthScore : 100;
-                  return (
-                    <tr key={staff.staffId} className="hover:bg-slate-50/50">
-                      <td className="px-6 py-4">
-                        <span className="w-7 h-7 rounded-full bg-slate-100 text-slate-800 font-extrabold text-xs flex items-center justify-center border border-slate-200">
-                          #{staff.rank || 1}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <p className="font-semibold text-slate-900">{staff.staffName}</p>
-                        <p className="text-xs text-slate-400">{staff.email}</p>
-                      </td>
-                      <td className="px-6 py-4">
-                        <button
-                          onClick={() => openAuditModal(`${staff.staffName}`, score, staff.scoreBreakdown)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-black border transition-all cursor-pointer flex items-center space-x-1.5 ${getScoreBadgeClass(score)}`}
-                          title="Click to view transparent point calculation breakdown"
-                        >
-                          <Award className="w-3.5 h-3.5" />
-                          <span>{score}% Score</span>
-                        </button>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex flex-wrap gap-1">
-                          {(staff.achievementBadges || []).length > 0 ? (
-                            (staff.achievementBadges || []).map((badge: string, bIdx: number) => (
-                              <span
-                                key={bIdx}
-                                className="px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded text-[11px] font-semibold"
-                              >
-                                {badge}
-                              </span>
-                            ))
-                          ) : (
-                            <span className="text-xs text-slate-400 italic">Standard</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-slate-600">{staff.departmentName}</td>
-                      <td className="px-6 py-4 font-semibold text-slate-800">
-                        <span className="text-indigo-600">{staff.assignedTickets}</span> /{' '}
-                        <span className="text-emerald-600">{staff.resolvedTickets}</span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`font-semibold ${
-                            staff.slaBreaches > 0 ? 'text-red-600' : 'text-slate-400'
-                          }`}
-                        >
-                          {staff.slaBreaches}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan={7} className="text-center py-8 text-slate-400">
-                    No staff members found matching your search.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

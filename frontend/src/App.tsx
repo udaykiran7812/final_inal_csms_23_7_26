@@ -2,7 +2,9 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { AppRoutes } from './routes';
+import { SmoothScroll } from './components/SmoothScroll';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,11 +18,15 @@ const queryClient = new QueryClient({
 export const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AuthProvider>
-          <AppRoutes />
-        </AuthProvider>
-      </BrowserRouter>
+      <ThemeProvider>
+        <SmoothScroll>
+          <BrowserRouter>
+            <AuthProvider>
+              <AppRoutes />
+            </AuthProvider>
+          </BrowserRouter>
+        </SmoothScroll>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };
