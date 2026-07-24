@@ -20,8 +20,8 @@ export const AuthLayout: React.FC = () => {
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-10 right-10 w-80 h-80 bg-violet-600/15 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Animated Card Container (Positioned Left-Center on Desktop) */}
-      <div className="relative z-10 sm:mx-auto lg:ml-16 xl:ml-32 lg:mr-auto sm:w-full sm:max-w-md px-4 sm:px-0">
+      {/* Animated Card Container */}
+      <div className="relative z-10 sm:mx-auto sm:w-full sm:max-w-md">
         <motion.div
           initial={{ opacity: 0, y: 25, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
